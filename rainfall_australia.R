@@ -9,7 +9,7 @@ library(tidyverse) # metapackage with lots of helpful functions
 # You can access files from datasets you've added to this kernel in the "../input/" directory.
 # You can see the files added to this kernel by running the code below. 
 
-list.files(path = "../input")
+list.files(path = "/Users/alessandro/r_exercises")
 
 
 library(data.table)
@@ -20,6 +20,10 @@ library(tibble)
 #importing the data
 rain = read.csv("/Users/alessandro/r_exercises/weatherAUS.csv")  ####put your working directory####
 head(rain, n=10)
+
+
+
+
 
 summary(rain)
 
