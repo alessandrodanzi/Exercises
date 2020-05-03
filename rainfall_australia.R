@@ -54,3 +54,88 @@ rain=select (rain,-c(WindGustDir,WindDir9am,WindDir3pm,Date))
 #Convert numeric
 rain$RainToday= as.numeric(rain$RainToday)
 rain$RainTomorrow= as.numeric(rain$RainTomorrow)
+
+
+#Assingn NA variable according to mod in categorical features
+
+#Location
+val1 <- unique(rain$Location[!is.na(rain$Location)])  # Values in rain$Location
+mode1 <- val1[which.max(tabulate(match(rain$Location, val1)))] # Mode of a feature
+
+rain$Location[is.na(rain$Location)] <- mode1
+
+
+#Add ID
+rain$ID <- seq.int(nrow(rain))
+
+a=select(rain, Location, ID)
+head(a)
+
+
+rain$Year=as.numeric(rain$Year)
+rain$Month=as.numeric(rain$Month)
+
+
+drops <- c("Location")
+rain=rain[ , !(names(rain) %in% drops)]
+
+
+#Assingn NA variable according to mean in numerical features
+
+rain = data.frame(
+    sapply(
+        rain,
+        function(x) ifelse(is.na(x),
+            mean(x, na.rm = TRUE),
+            x)))
+colSums(is.na(rain))
+      
+      
+rain=round(rain, digits=2)
+      
+      
+#Inner Join a data frame and rain data frame because I want to add Location column like before.
+final=merge(x = rain, y = a, by = "ID", all.x = TRUE)
+final <- final[order(final$ID),]
+      
+      
+final$AvgTemp <- round(rowMeans(rain[c('MinTemp', 'MaxTemp')], na.rm=TRUE),digits=2)
+      
+      
+      
+      
+#######DESCRIPTIVE STATISTICS######
+
+print("mean:")
+mean(final$AvgTemp)
+print("variance:")
+var(final$AvgTemp)
+print("standard deviation:")
+sd(final$AvgTemp)
+print("q1, q2, q3, q4 :")
+quantile(final$AvgTemp)
+print("median:")
+median(final$AvgTemp)
+print("range:")
+range(final$AvgTemp)
+print("Difference between boundaries :")
+range(final$AvgTemp)[2]- range(final$AvgTemp)[1]
+print("q3-q1:")
+unname(quantile(final$AvgTemp)[4] - quantile(final$AvgTemp)[2])
+      
+      
+      
+      
+#VISUALIZATION
+install.packages("viridis")  # Install
+library("viridis")           # Load
+library(ggplot2)
+# Gradient color
+#in most cases you start with ggplot(), supply a dataset and aesthetic mapping (with aes()).
+#You then add on layers (like geom_point() or geom_histogram()), scales (like scale_colour_brewer()), 
+#faceting specifications (like facet_wrap()) and coordinate systems (like coord_flip()).
+ggplot(final, aes(MinTemp, MaxTemp))+
+  geom_point(aes(color = MinTemp)) +
+  scale_color_viridis(option = "D")+
+  theme_minimal() +
+  theme(legend.position = "bottom")
