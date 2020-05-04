@@ -1,0 +1,190 @@
+#1
+setwd("/Users/alessandro/r_exercises")    ####put your working directory###
+
+install.packages("tidyverse")
+install.packages("corrplot")
+install.packages("RColorBrewer")
+
+#2
+library(tidyverse)
+
+list.files(path = "/Users/alessandro/r_exercises")
+
+library(data.table)
+library(dplyr, warn.conflicts = FALSE)
+library(ggplot2)
+library(tibble)
+
+library(corrplot)
+library(RColorBrewer)
+
+rain = read.csv("/Users/alessandro/r_exercises/weatherAUSclean.csv")
+head(rain, n=10)
+
+#what this does?
+summary(rain)
+#
+
+#3
+#add columns
+rain$Year =substr(rain$Date, 7, 10)
+rain$Month =substr(rain$Date, 4, 5)
+summary(rain)
+#4
+colSums(is.na(rain))
+
+#5
+df_temp <- select(rain,MinTemp,MaxTemp,Rainfall,Evaporation)
+#in select il primo elemento e' da dove prendo i dati
+#database temporaneo con database vecchio e colonne che vogliamo selezionare (che sono le colonne con valori NA)
+
+
+#6
+#Assingn NA variable according to mean in numerical features
+#ogni volta che c'e' NA viene sostituito con la media di quella colonna 
+df_temp = data.frame(
+  sapply(
+    df_temp,
+    function(x) ifelse(is.na(x),
+                       mean(x, na.rm = TRUE),
+                       x)))
+head(df_temp, n=10)
+colSums(is.na(df_temp))  #non ci sono piu', abbiamo eliminato i NA
+
+#7
+#rinomino i dati con un dato
+Date <- rain$Date
+Location <- rain$Location
+Year <- rain$Year
+Month <- rain$Month
+
+rain <- cbind(Location, Date, Year, Month, df_temp)
+#riassocio il mio dataset rain con i vari elementi e df_temp con all'intern il resto dei dati
+head(rain, n=10)
+
+
+colSums(is.na(rain))
+
+#DESCRIPTIVE STATISTICS
+#8
+#MinTemp
+
+print("mean:")
+mean(rain$MinTemp)
+print("variance:")
+var(rain$MinTemp)
+print("standard deviation:")
+sd(rain$MinTemp)
+print("q1, q2, q3, q4 :")
+quantile(rain$MinTemp)
+print("median:")
+median(rain$MinTemp)
+print("range:")
+range(rain$MinTemp)
+print("Difference between boundaries :")
+range(rain$MinTemp)[2]- range(rain$MinTemp)[1]
+print("q3-q1:")
+unname(quantile(rain$MinTemp)[4] - quantile(rain$MinTemp)[2])
+
+#MaxTemp
+print("mean:")
+mean(rain$MaxTemp)
+print("variance:")
+var(rain$MaxTemp)
+print("standard deviation:")
+sd(rain$MaxTemp)
+print("q1, q2, q3, q4 :")
+quantile(rain$MaxTemp)
+print("median:")
+median(rain$MaxTemp)
+print("range:")
+range(rain$MaxTemp)
+print("Difference between boundaries :")
+range(rain$MaxTemp)[2]- range(rain$MaxTemp)[1]
+print("q3-q1:")
+unname(quantile(rain$MaxTemp)[4] - quantile(rain$MaxTemp)[2])
+
+#Rainfall
+
+print("mean:")
+mean(rain$Rainfall)
+print("variance:")
+var(rain$Rainfall)
+print("standard deviation:")
+sd(rain$Rainfall)
+print("q1, q2, q3, q4 :")
+quantile(rain$Rainfall)
+print("median:")
+median(rain$Rainfall)
+print("range:")
+range(rain$Rainfall)
+print("Difference between boundaries :")
+range(rain$Rainfall)[2]- range(rain$Rainfall)[1]
+print("q3-q1:")
+unname(quantile(rain$Rainfall)[4] - quantile(rain$Rainfall)[2])
+
+#Evaporation
+
+print("mean:")
+mean(rain$Evaporation)
+print("variance:")
+var(rain$Evaporation)
+print("standard deviation:")
+sd(rain$Evaporation)
+print("q1, q2, q3, q4 :")
+quantile(rain$Evaporation)
+print("median:")
+median(rain$Evaporation)
+print("range:")
+range(rain$Evaporation)
+print("Difference between boundaries :")
+range(rain$Evaporation)[2]- range(rain$Evaporation)[1]
+print("q3-q1:")
+unname(quantile(rain$Evaporation)[4] - quantile(rain$Evaporation)[2])
+
+#frequency ditribution for qualitative variables (Location, Year)
+#9
+Location <- rain$Location
+Location.freq <- table(Location)
+Location.freq
+
+Year <- rain$Year
+Year.freq <- table(Year)
+Year.freq
+
+#MinTemp
+ggplot(rain, aes(x=MinTemp)) + geom_histogram(aes(y=..density..),color="darkblue", fill="lightblue", position = "dodge") + geom_density(alpha=.2, fill= "violetred") + geom_vline(aes(xintercept=mean(MinTemp)),colour="tomato3", size=1)
+#MaxTemp
+ggplot(rain, aes(x=MaxTemp)) + geom_histogram(aes(y=..density..),color="red1", fill= "yellow", position = "dodge") + geom_density(alpha=.2, fill= "seagreen1") + geom_vline(aes(xintercept=mean(MaxTemp)),colour="royalblue", size=2)
+#Rainfall
+ggplot(rain, aes(x=Rainfall)) + scale_x_log10() + geom_histogram(aes(y=..density..),color="red1", fill= "yellow", position = "dodge") + geom_density(alpha=.2, fill= "seagreen1") + geom_vline(aes(xintercept=mean(Rainfall)),colour="royalblue", size=0.5)
+#ultimo in Log scale da Nico
+#Evaporation
+ggplot(rain, aes(x=Evaporation)) + scale_x_log10() + geom_histogram(aes(y=..density..),color="red1", fill= "yellow", position = "dodge") + geom_density(alpha=.2, fill= "seagreen1") + geom_vline(aes(xintercept=mean(Evaporation)),colour="royalblue", size=0.5)
+
+  
+
+#legenda=  + theme(legend.position = "top")
+#lo faccio per le altre
+
+
+
+#Correlazione bivariate (solo su df_temp perche' sono quelle non descrittive) -> correlazione di Pearson
+corM <- cor(df_temp)  #da la matrice di correlazione
+
+corrplot(corM, type = "upper", order= "hclust", col = brewer.pal(n=8, name= "RdYlBu"))
+#ci vuole solo un po di tempo
+ggpairs(df_temp)
+
+#lo faccio per ogni variabile (vedi colori boxplot) far vedere a coppie
+
+#confronto tra gli anni
+ggplot(rain, aes(x= Year, y = MinTemp)) + geom_boxplot() 
+#andamento mensile
+ggplot(rain, aes(x= Month, y = MinTemp, fill = Year)) + geom_boxplot() + facet_wrap(~Year)
+
+###################################################################
+ggplot(rain, aes(x= Year, y = Rainfall, fill = Year)) + geom_boxplot() + facet_wrap(~Location)
+
+ggplot(rain, aes(x= Year, y = MinTemp, fill = Year)) + geom_boxplot() + facet_wrap(~Location)
+
