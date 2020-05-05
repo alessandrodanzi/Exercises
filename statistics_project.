@@ -34,7 +34,7 @@ summary(rain)
 colSums(is.na(rain))
 
 #5
-df_temp <- select(rain,MinTemp,MaxTemp,Rainfall,Evaporation)
+quant_var <- select(rain,MinTemp,MaxTemp,Rainfall,Evaporation)
 #in select il primo elemento e' da dove prendo i dati
 #database temporaneo con database vecchio e colonne che vogliamo selezionare (che sono le colonne con valori NA)
 
@@ -42,14 +42,14 @@ df_temp <- select(rain,MinTemp,MaxTemp,Rainfall,Evaporation)
 #6
 #Assingn NA variable according to mean in numerical features
 #ogni volta che c'e' NA viene sostituito con la media di quella colonna 
-df_temp = data.frame(
+quant_var = data.frame(
   sapply(
-    df_temp,
+    quant_var,
     function(x) ifelse(is.na(x),
                        mean(x, na.rm = TRUE),
                        x)))
-head(df_temp, n=10)
-colSums(is.na(df_temp))  #non ci sono piu', abbiamo eliminato i NA
+head(quant_var, n=10)
+colSums(is.na(quant_var))  #non ci sono piu', abbiamo eliminato i NA
 
 #7
 #rinomino i dati con un dato
@@ -152,36 +152,59 @@ Year <- rain$Year
 Year.freq <- table(Year)
 Year.freq
 
+#10
 #MinTemp
 ggplot(rain, aes(x=MinTemp)) + geom_histogram(aes(y=..density..),color="darkblue", fill="lightblue", position = "dodge") + geom_density(alpha=.2, fill= "violetred") + geom_vline(aes(xintercept=mean(MinTemp)),colour="tomato3", size=1)
+
+#11
 #MaxTemp
 ggplot(rain, aes(x=MaxTemp)) + geom_histogram(aes(y=..density..),color="red1", fill= "yellow", position = "dodge") + geom_density(alpha=.2, fill= "seagreen1") + geom_vline(aes(xintercept=mean(MaxTemp)),colour="royalblue", size=2)
+
+#12
 #Rainfall
 ggplot(rain, aes(x=Rainfall)) + scale_x_log10() + geom_histogram(aes(y=..density..),color="red1", fill= "yellow", position = "dodge") + geom_density(alpha=.2, fill= "seagreen1") + geom_vline(aes(xintercept=mean(Rainfall)),colour="royalblue", size=0.5)
-#ultimo in Log scale da Nico
+
+
+#13
 #Evaporation
 ggplot(rain, aes(x=Evaporation)) + scale_x_log10() + geom_histogram(aes(y=..density..),color="red1", fill= "yellow", position = "dodge") + geom_density(alpha=.2, fill= "seagreen1") + geom_vline(aes(xintercept=mean(Evaporation)),colour="royalblue", size=0.5)
 
   
 
-#legenda=  + theme(legend.position = "top")
-#lo faccio per le altre
 
+#14
+#Correlazione bivariate (solo su quant_var perche' sono quelle non descrittive) -> correlazione di Pearson
+corM <- cor(quant_var)  #da la matrice di correlazione
 
-
-#Correlazione bivariate (solo su df_temp perche' sono quelle non descrittive) -> correlazione di Pearson
-corM <- cor(df_temp)  #da la matrice di correlazione
-
+#15
 corrplot(corM, type = "upper", order= "hclust", col = brewer.pal(n=8, name= "RdYlBu"))
 #ci vuole solo un po di tempo
-ggpairs(df_temp)
+#16
+ggpairs(quant_var)
 
 #lo faccio per ogni variabile (vedi colori boxplot) far vedere a coppie
 
-#confronto tra gli anni
+#confronto tra gli anni MinTemp
 ggplot(rain, aes(x= Year, y = MinTemp)) + geom_boxplot() 
-#andamento mensile
+#andamento mensile MinTemp
 ggplot(rain, aes(x= Month, y = MinTemp, fill = Year)) + geom_boxplot() + facet_wrap(~Year)
+
+#confronto tra gli anni MaxTemp
+ggplot(rain, aes(x= Year, y = MaxTemp)) + geom_boxplot() 
+#andamento mensile MaxTemp
+ggplot(rain, aes(x= Month, y = MaxTemp, fill = Year)) + geom_boxplot() + facet_wrap(~Year)
+
+##scatterplot
+#confronto tra gli anni Rainfall
+ggplot(rain, aes(x= Year, y = Rainfall)) + geom_point() 
+#andamento mensile Rainfall
+ggplot(rain, aes(x= Month, y = Rainfall, fill = Year)) + geom_point() + facet_wrap(~Year)
+
+##scatterplot
+#confronto tra gli anni Rainfall
+ggplot(rain, aes(x= Year, y = Evaporation)) + geom_point() 
+#andamento mensile Rainfall
+ggplot(rain, aes(x= Month, y = Evaporation, fill = Year)) + geom_point() + facet_wrap(~Year)
 
 ###################################################################
 ggplot(rain, aes(x= Year, y = Rainfall, fill = Year)) + geom_boxplot() + facet_wrap(~Location)
