@@ -86,6 +86,9 @@ range(rain$MinTemp)[2]- range(rain$MinTemp)[1]
 print("q3-q1:")
 unname(quantile(rain$MinTemp)[4] - quantile(rain$MinTemp)[2])
 
+
+####################
+
 #MaxTemp
 print("mean:")
 mean(rain$MaxTemp)
@@ -179,35 +182,45 @@ corM <- cor(quant_var)  #da la matrice di correlazione
 #15
 corrplot(corM, type = "upper", order= "hclust", col = brewer.pal(n=8, name= "RdYlBu"))
 #ci vuole solo un po di tempo
+
 #16
-ggpairs(quant_var)
+ggpairs(quant_var,  lower = list(continuous = wrap("smooth", alpha = 0.3, size=0.8)))
+#dopo aver aspettato una vita
 
-#lo faccio per ogni variabile (vedi colori boxplot) far vedere a coppie
+#lo faccio per ogni variabile (vedi colori boxplot) far vedere a coppie:
 
-#confronto tra gli anni MinTemp
-ggplot(rain, aes(x= Year, y = MinTemp)) + geom_boxplot() 
-#andamento mensile MinTemp
+#MinTemp
+
+#confronto tra gli anni
+ggplot(rain, aes(x= Year, y = MinTemp)) + geom_boxplot(fill='#A4A4A4', color="darkblue") 
+#andamento mensile
 ggplot(rain, aes(x= Month, y = MinTemp, fill = Year)) + geom_boxplot() + facet_wrap(~Year)
-
-#confronto tra gli anni MaxTemp
-ggplot(rain, aes(x= Year, y = MaxTemp)) + geom_boxplot() 
-#andamento mensile MaxTemp
-ggplot(rain, aes(x= Month, y = MaxTemp, fill = Year)) + geom_boxplot() + facet_wrap(~Year)
-
-##scatterplot
-#confronto tra gli anni Rainfall
-ggplot(rain, aes(x= Year, y = Rainfall)) + geom_point() 
-#andamento mensile Rainfall
-ggplot(rain, aes(x= Month, y = Rainfall, fill = Year)) + geom_point() + facet_wrap(~Year)
-
-##scatterplot
-#confronto tra gli anni Rainfall
-ggplot(rain, aes(x= Year, y = Evaporation)) + geom_point() 
-#andamento mensile Rainfall
-ggplot(rain, aes(x= Month, y = Evaporation, fill = Year)) + geom_point() + facet_wrap(~Year)
-
-###################################################################
-ggplot(rain, aes(x= Year, y = Rainfall, fill = Year)) + geom_boxplot() + facet_wrap(~Location)
-
+#andamento annuale per location
 ggplot(rain, aes(x= Year, y = MinTemp, fill = Year)) + geom_boxplot() + facet_wrap(~Location)
 
+#MaxTemp
+
+#confronto tra gli anni
+ggplot(rain, aes(x= Year, y = MaxTemp)) + geom_boxplot(fill='#A4A4A4', color="darkred") 
+#andamento mensile
+ggplot(rain, aes(x= Month, y = MaxTemp, fill = Year)) + geom_boxplot() + facet_wrap(~Year)
+#andamento annuale per location
+ggplot(rain, aes(x= Year, y = MaxTemp, fill = Year)) + geom_boxplot() + facet_wrap(~Location)
+
+#Rainfall
+#confronto tra gli anni
+ggplot(rain, aes(x= Year, y = Rainfall)) + geom_point() 
+#andamento mensile
+ggplot(rain, aes(x= Month, y = Rainfall, fill = Year)) + geom_point() + facet_wrap(~Year)
+#andamento annuale per location
+ggplot(rain, aes(x= Year, y = Rainfall, fill = Year)) + geom_point() + facet_wrap(~Location)
+
+#Evaporation
+ggplot(rain, aes(x= Year, y = Evaporation)) + geom_point() 
+#andamento mensile
+ggplot(rain, aes(x= Month, y = Evaporation, fill = Year)) + geom_point() + facet_wrap(~Year)
+#andamento annuale per location
+ggplot(rain, aes(x= Year, y = Evaporation, fill = Year)) + geom_point() + facet_wrap(~Location)
+
+
+ggts(rain, "Year", c("MinTemp", "MaxTemp", "Rainfall", "Evaporation"))
