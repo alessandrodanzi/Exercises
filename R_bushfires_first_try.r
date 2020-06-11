@@ -33,6 +33,10 @@ plot(tassielossyear_crop, main = "Cropped Tasmanian Vegetation Loss")
 # add shapefile on top of the existing raster
 plot(crop_extent, add = TRUE)
 
+cl<-colorRampPalette(c("red","olive","light yellow"))(100)  
+par(mfrow=c(2,2))
+plot(tassiefirst_crop, col=cl)
+plot(tassielast_crop, col=cl)
 
 
 
