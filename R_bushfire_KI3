@@ -472,35 +472,46 @@ plot(ndvi5, breaks=breaks, col=palette)
 ##############################################
 ############################################
 ###############################################
-#summary as the human eye see it
+#summary 2019/2020 as the human eye see it
 par(mfrow=c(3,2))
 cl <- colorRampPalette(c('black','grey','light grey'))(100) 
-#as the human eye see it (red-green-blue)
+
 plotRGB(KI08122019_7bands,3,2,1, stretch="lin")
 plotRGB(KI09012020_7bands,3,2,1, stretch="lin")
 plotRGB(KI10022020_7bands,3,2,1, stretch="lin")
 plotRGB(KI14042020_7bands,3,2,1, stretch="lin")
 plotRGB(KI16052020_7bands,3,2,1, stretch="lin")
 
-#summary highlighting hot soil temperature in red (TIRS,r,b)
+#summary 2019/2020 highlighting hot soil temperature in red (TIRS,r,b)
 par(mfrow=c(3,2))
 cl <- colorRampPalette(c('black','grey','light grey'))(100) 
-#as the human eye see it (red-green-blue)
+
 plotRGB(KI08122019_7bands,7,3,1, stretch="lin")
 plotRGB(KI09012020_7bands,7,3,1, stretch="lin")
 plotRGB(KI10022020_7bands,7,3,1, stretch="lin")
 plotRGB(KI14042020_7bands,7,3,1, stretch="lin")
 plotRGB(KI16052020_7bands,7,3,1, stretch="lin")
 
-#summary highlighting the burnt area (SWIR-NIR-red)
+#summary 2019/2020 highlighting the burnt area (SWIR-NIR-red)
 par(mfrow=c(3,2))
 cl <- colorRampPalette(c('black','grey','light grey'))(100) 
-#as the human eye see it (red-green-blue)
+
 plotRGB(KI08122019_7bands,5,4,3, stretch="lin")
 plotRGB(KI09012020_7bands,5,4,3, stretch="lin")
 plotRGB(KI10022020_7bands,5,4,3, stretch="lin")
 plotRGB(KI14042020_7bands,5,4,3, stretch="lin")
 plotRGB(KI16052020_7bands,5,4,3, stretch="lin")
 
+#summary 2019/2020 NDVI changes
+#ndvi <- (infrared - red) / (infrared + red)  #I use NIR instead of infrared
+par(mfrow=c(3,2))
+palette = colorRampPalette(c("blue", "white", "red"))(256)
+plot(ndvi1, col=palette)
+plot(ndvi2, col=palette)
+plot(ndvi3, col=palette)
+plot(ndvi4, col=palette)
+plot(ndvi5, col=palette)
+
 ######################################################################################
 ######################################################################################
+####################################FIRE SEASON 2018/2019#############################
