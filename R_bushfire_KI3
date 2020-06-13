@@ -515,3 +515,287 @@ plot(ndvi5, col=palette)
 ######################################################################################
 ######################################################################################
 ####################################FIRE SEASON 2018/2019#############################
+
+#####(6) 05.12.18######################################################################
+rlist <- list.files(pattern="LC08_L1TP_098085_20181205_20181211_01_T1_")
+#rlist to see the files within it
+#we can now make the stack function to connect the images on layers
+#
+#RGB
+KI05122018_b <-raster("LC08_L1TP_098085_20181205_20181211_01_T1_B2.TIF")
+KI05122018_g <- raster("LC08_L1TP_098085_20181205_20181211_01_T1_B3.TIF")
+KI05122018_r <- raster("LC08_L1TP_098085_20181205_20181211_01_T1_B4.TIF")
+KI05122018_nir <-raster("LC08_L1TP_098085_20181205_20181211_01_T1_B5.TIF")
+KI05122018_swir <- raster("LC08_L1TP_098085_20181205_20181211_01_T1_B6.TIF")
+KI05122018_panchrom <-raster("LC08_L1TP_098085_20181205_20181211_01_T1_B8.TIF")
+KI05122018_tirs <-raster("LC08_L1TP_098085_20181205_20181211_01_T1_B10.TIF")
+
+
+#KI05122018_7bands<- stack(c(KI05122018_b, KI05122018_g, KI05122018_r, KI05122018_nir, KI05122018_swir, KI05122018_panchrom, KI05122018_tirs))
+#i cannot do it because KI05122018_panchrom and KI05122018_tirs have different extent from the rest (they all have 30m, panchrom 15m and tirs 100m)
+
+KI05122018_panchrom <- resample(KI05122018_panchrom, KI05122018_swir)
+KI05122018_tirs <- resample(KI05122018_tirs, KI05122018_swir)
+
+KI05122018_7bands<- stack(c(KI05122018_b, KI05122018_g, KI05122018_r, KI05122018_nir, KI05122018_swir, KI05122018_panchrom, KI05122018_tirs))
+#now it works#
+
+
+shp <- shapefile("LANDSCAPE_Biophysical_L3LandZones_GDA2020")
+
+proj4string(KI05122018_7bands)
+proj4string(shp)
+
+shp6 <- spTransform(shp, proj4string(KI05122018_7bands)) 
+
+plot(KI05122018_7bands)
+  plot(shp6, add=T)
+
+KI05122018_7bands <- mask(crop(KI05122018_7bands, extent(shp6)), shp6)  
+
+plot(KI05122018_7bands)
+  plot(shp6, add=T)
+  
+  
+#####three plots highlighting different things (human eye, vegetation, burnt area) with Kangaroo Island isolated from the rest of the map####
+par(mfrow=c(3,1))
+cl <- colorRampPalette(c('black','grey','light grey'))(100) 
+#B1 blue
+#B2 green
+#B3 red
+#B4 NIR
+#B5 SWIR
+#B6 panchromatic
+#B7 TIRS
+
+#as the human eye see it (red-green-blue)
+plotRGB(KI05122018_7bands,3,2,1, stretch="lin")
+
+#highlighting hot soil temperature in red (TIRS,r,b)
+plotRGB(KI05122018_7bands,7,3,1, stretch="lin")
+
+#highlight the burnt area (SWIR-NIR-red)
+plotRGB(KI05122018_7bands,5,4,3, stretch="lin")
+
+
+######NDVI#######
+# Perform raster algebra to calculate a raster of NDVI values
+#ndvi <- (infrared - red) / (infrared + red)  #I use NIR instead of infrared
+ndvi6 <- (KI05122018_nir - KI05122018_r) / (KI05122018_nir + KI05122018_r)
+
+
+#and once again I want to select only the island area
+proj4string(ndvi6)
+proj4string(shp6)
+
+shp6 <- spTransform(shp6, proj4string(ndvi6)) 
+
+plot(ndvi6)
+  plot(shp6, add=T)
+
+ndvi6 <- mask(crop(ndvi6, extent(shp6)), shp6)  
+
+plot(ndvi6)
+  plot(shp6, add=T)
+  
+# Plot the NDVI as a false-color image
+palette = colorRampPalette(c("blue", "white", "red"))(256)
+plot(ndvi6, col=palette)
+
+#NDVI range is between -1 and +1
+#hist(ndvi6, maxpixels = ncell(ndvi1))
+#i see where to focus the range of colours to better enhance it
+breaks <- seq(-0.4, 0.4, 0.1)
+palette <- colorRampPalette(c("blue", "white", "red"))(8)
+plot(ndvi6, breaks=breaks, col=palette)
+#################################
+
+#####(7) 06.01.19######################################################################
+rlist <- list.files(pattern="LC08_L1TP_098085_20190106_20190130_01_T1_")
+#rlist to see the files within it
+#we can now make the stack function to connect the images on layers
+#
+#RGB
+KI06012019_b <-raster("LC08_L1TP_098085_20190106_20190130_01_T1_B2.TIF")
+KI06012019_g <- raster("LC08_L1TP_098085_20190106_20190130_01_T1_B3.TIF")
+KI06012019_r <- raster("LC08_L1TP_098085_20190106_20190130_01_T1_B4.TIF")
+KI06012019_nir <-raster("LC08_L1TP_098085_20190106_20190130_01_T1_B5.TIF")
+KI06012019_swir <- raster("LC08_L1TP_098085_20190106_20190130_01_T1_B6.TIF")
+KI06012019_panchrom <-raster("LC08_L1TP_098085_20190106_20190130_01_T1_B8.TIF")
+KI06012019_tirs <-raster("LC08_L1TP_098085_20190106_20190130_01_T1_B10.TIF")
+
+
+#KI06012019_7bands<- stack(c(KI06012019_b, KI06012019_g, KI06012019_r, KI06012019_nir, KI06012019_swir, KI06012019_panchrom, KI06012019_tirs))
+#i cannot do it because KI05122018_panchrom and KI06012019_tirs have different extent from the rest (they all have 30m, panchrom 15m and tirs 100m)
+
+KI06012019_panchrom <- resample(KI06012019_panchrom, KI06012019_swir)
+KI06012019_tirs <- resample(KI06012019_tirs, KI06012019_swir)
+
+KI06012019_7bands<- stack(c(KI06012019_b, KI06012019_g, KI06012019_r, KI06012019_nir, KI06012019_swir, KI06012019_panchrom, KI06012019_tirs))
+#now it works#
+
+
+shp <- shapefile("LANDSCAPE_Biophysical_L3LandZones_GDA2020")
+
+proj4string(KI06012019_7bands)
+proj4string(shp)
+
+shp7 <- spTransform(shp, proj4string(KI06012019_7bands)) 
+
+plot(KI06012019_7bands)
+  plot(shp7, add=T)
+
+KI06012019_7bands <- mask(crop(KI06012019_7bands, extent(shp7)), shp7)  
+
+plot(KI06012019_7bands)
+  plot(shp7, add=T)
+  
+  
+#####three plots highlighting different things (human eye, vegetation, burnt area) with Kangaroo Island isolated from the rest of the map####
+par(mfrow=c(3,1))
+cl <- colorRampPalette(c('black','grey','light grey'))(100) 
+#B1 blue
+#B2 green
+#B3 red
+#B4 NIR
+#B5 SWIR
+#B6 panchromatic
+#B7 TIRS
+
+#as the human eye see it (red-green-blue)
+plotRGB(KI06012019_7bands,3,2,1, stretch="lin")
+
+#highlighting hot soil temperature in red (TIRS,r,b)
+plotRGB(KI06012019_7bands,7,3,1, stretch="lin")
+
+#highlight the burnt area (SWIR-NIR-red)
+plotRGB(KI06012019_7bands,5,4,3, stretch="lin")
+
+
+######NDVI#######
+# Perform raster algebra to calculate a raster of NDVI values
+#ndvi <- (infrared - red) / (infrared + red)  #I use NIR instead of infrared
+ndvi7 <- (KI06012019_nir - KI06012019_r) / (KI06012019_nir + KI06012019_r)
+
+
+#and once again I want to select only the island area
+proj4string(ndvi7)
+proj4string(shp7)
+
+shp7 <- spTransform(shp7, proj4string(ndvi7)) 
+
+plot(ndvi7)
+  plot(shp7, add=T)
+
+ndvi7 <- mask(crop(ndvi7, extent(shp7)), shp7)  
+
+plot(ndvi7)
+  plot(shp7, add=T)
+  
+# Plot the NDVI as a false-color image
+palette = colorRampPalette(c("blue", "white", "red"))(256)
+plot(ndvi7, col=palette)
+
+#NDVI range is between -1 and +1
+#hist(ndvi7, maxpixels = ncell(ndvi1))
+#i see where to focus the range of colours to better enhance it
+breaks <- seq(-0.4, 0.4, 0.1)
+palette <- colorRampPalette(c("blue", "white", "red"))(8)
+plot(ndvi7, breaks=breaks, col=palette)
+#################################
+
+
+#####(8) 12.04.19######################################################################
+rlist <- list.files(pattern="LC08_L1TP_098085_20190412_20190422_01_T1_")
+#rlist to see the files within it
+#we can now make the stack function to connect the images on layers
+#
+#RGB
+KI12042019_b <-raster("LC08_L1TP_098085_20190412_20190422_01_T1_B2.TIF")
+KI12042019_g <- raster("LC08_L1TP_098085_20190412_20190422_01_T1_B3.TIF")
+KI12042019_r <- raster("LC08_L1TP_098085_20190412_20190422_01_T1_B4.TIF")
+KI12042019_nir <-raster("LC08_L1TP_098085_20190412_20190422_01_T1_B5.TIF")
+KI12042019_swir <- raster("LC08_L1TP_098085_20190412_20190422_01_T1_B6.TIF")
+KI12042019_panchrom <-raster("LC08_L1TP_098085_20190412_20190422_01_T1_B8.TIF")
+KI12042019_tirs <-raster("LC08_L1TP_098085_20190412_20190422_01_T1_B10.TIF")
+
+
+#KI12042019_7bands<- stack(c(KI12042019_b, KI12042019_g, KI12042019_r, KI12042019_nir, KI12042019_swir, KI12042019_panchrom, KI12042019_tirs))
+#i cannot do it because KI12042019_panchrom and KI12042019_tirs have different extent from the rest (they all have 30m, panchrom 15m and tirs 100m)
+
+KI12042019_panchrom <- resample(KI12042019_panchrom, KI12042019_swir)
+KI12042019_tirs <- resample(KI12042019_tirs, KI12042019_swir)
+
+KI12042019_7bands<- stack(c(KI12042019_b, KI12042019_g, KI12042019_r, KI12042019_nir, KI12042019_swir, KI12042019_panchrom, KI12042019_tirs))
+#now it works#
+
+
+shp <- shapefile("LANDSCAPE_Biophysical_L3LandZones_GDA2020")
+
+proj4string(KI12042019_7bands)
+proj4string(shp)
+
+shp8 <- spTransform(shp, proj4string(KI12042019_7bands)) 
+
+plot(KI12042019_7bands)
+  plot(shp8, add=T)
+
+KI12042019_7bands <- mask(crop(KI12042019_7bands, extent(shp8)), shp8)  
+
+plot(KI12042019_7bands)
+  plot(shp8, add=T)
+  
+  
+#####three plots highlighting different things (human eye, vegetation, burnt area) with Kangaroo Island isolated from the rest of the map####
+par(mfrow=c(3,1))
+cl <- colorRampPalette(c('black','grey','light grey'))(100) 
+#B1 blue
+#B2 green
+#B3 red
+#B4 NIR
+#B5 SWIR
+#B6 panchromatic
+#B7 TIRS
+
+#as the human eye see it (red-green-blue)
+plotRGB(KI12042019_7bands,3,2,1, stretch="lin")
+
+#highlighting hot soil temperature in red (TIRS,r,b)
+plotRGB(KI12042019_7bands,7,3,1, stretch="lin")
+
+#highlight the burnt area (SWIR-NIR-red)
+plotRGB(KI12042019_7bands,5,4,3, stretch="lin")
+
+
+######NDVI#######
+# Perform raster algebra to calculate a raster of NDVI values
+#ndvi <- (infrared - red) / (infrared + red)  #I use NIR instead of infrared
+ndvi8 <- (KI12042019_nir - KI12042019_r) / (KI12042019_nir + KI12042019_r)
+
+
+#and once again I want to select only the island area
+proj4string(ndvi8)
+proj4string(shp8)
+
+shp8 <- spTransform(shp8, proj4string(ndvi8)) 
+
+plot(ndvi8)
+  plot(shp8, add=T)
+
+ndvi8 <- mask(crop(ndvi8, extent(shp8)), shp8)  
+
+plot(ndvi8)
+  plot(shp8, add=T)
+  
+# Plot the NDVI as a false-color image
+palette = colorRampPalette(c("blue", "white", "red"))(256)
+plot(ndvi8, col=palette)
+
+#NDVI range is between -1 and +1
+#hist(ndvi8, maxpixels = ncell(ndvi1))
+#i see where to focus the range of colours to better enhance it
+breaks <- seq(-0.4, 0.4, 0.1)
+palette <- colorRampPalette(c("blue", "white", "red"))(8)
+plot(ndvi8, breaks=breaks, col=palette)
+#################################
+#################################
