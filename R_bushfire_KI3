@@ -1,24 +1,25 @@
-setwd("/Users/alessandro/lab/bushfire/kangarooisland") #mac
+###DOWNLOAD FROM: https://glovis.usgs.gov/app, https://data.gov.au/dataset (for the .shp file)
 
+###install.packages() if not already done
 #install.packages("raster")
-#RStoolbox is a package for remote sensing image processing and analysis, such as calculating spectral indices, principal component transformation, unsupervised and supervised classification or fractional cover analyses.
-#install.packages("RStoolbox")
-#make use of the library
+#install.packages("rgdal")
+#install.packages("sp")
+
+###make use of the library
 library(raster)
 library(sp)
 library(rgdal)
+#set the working directory in the general folder to extract the shape file that I'll use for every dataset
 
-#DOWNLOAD FROM: https://glovis.usgs.gov/app, https://data.gov.au/dataset (for the .shp file)
+setwd("/Users/alessandro/lab/bushfire/kangarooisland") #mac
+shp <- shapefile("LANDSCAPE_Biophysical_L3LandZones_GDA2020")
+
 
 ################################FIRE SEASON 2019/2020##################################
 ######################################################################################
 
 #####(1) 08.12.19######################################################################
-rlist <- list.files(pattern="LC08_L1TP_098085_20191208_20191217_01_T1_")
-#rlist to see the files within it
-#we can now make the stack function to connect the images on layers
-#
-#RGB
+setwd("/Users/alessandro/lab/bushfire/kangarooisland/KI08122019") #mac
 KI08122019_b <-raster("LC08_L1TP_098085_20191208_20191217_01_T1_B2.TIF")
 KI08122019_g <- raster("LC08_L1TP_098085_20191208_20191217_01_T1_B3.TIF")
 KI08122019_r <- raster("LC08_L1TP_098085_20191208_20191217_01_T1_B4.TIF")
@@ -26,6 +27,7 @@ KI08122019_nir <-raster("LC08_L1TP_098085_20191208_20191217_01_T1_B5.TIF")
 KI08122019_swir <- raster("LC08_L1TP_098085_20191208_20191217_01_T1_B6.TIF")
 KI08122019_panchrom <-raster("LC08_L1TP_098085_20191208_20191217_01_T1_B8.TIF")
 KI08122019_tirs <-raster("LC08_L1TP_098085_20191208_20191217_01_T1_B10.TIF")
+KI08122019_bqa <-raster("LC08_L1TP_098085_20191208_20191217_01_T1_BQA.TIF")
 
 
 #KI08122019_7bands<- stack(c(KI08122019_b, KI08122019_g, KI08122019_r, KI08122019_nir, KI08122019_swir, KI08122019_panchrom, KI08122019_tirs))
@@ -36,9 +38,6 @@ KI08122019_tirs <- resample(KI08122019_tirs, KI08122019_swir)
 
 KI08122019_7bands<- stack(c(KI08122019_b, KI08122019_g, KI08122019_r, KI08122019_nir, KI08122019_swir, KI08122019_panchrom, KI08122019_tirs))
 #now it works#
-
-
-shp <- shapefile("LANDSCAPE_Biophysical_L3LandZones_GDA2020")
 
 proj4string(KI08122019_7bands)
 proj4string(shp)
@@ -75,6 +74,12 @@ plotRGB(KI08122019_7bands,7,3,1, stretch="lin")
 plotRGB(KI08122019_7bands,5,4,3, stretch="lin")
 
 
+#########################PROVA
+#lsCloudMask("/Users/alessandro/lab/bushfire/kangarooisland/KI08122019", "/Users/alessandro/lab/bushfire/kangarooisland/KI08122019", sensitivity = 2800, overwrite = FALSE,verbose = FALSE)
+
+
+########################END
+
 ######NDVI#######
 # Perform raster algebra to calculate a raster of NDVI values
 #ndvi <- (infrared - red) / (infrared + red)  #I use NIR instead of infrared
@@ -110,11 +115,8 @@ plot(ndvi1, breaks=breaks, col=palette)
 
 
 #####(2) 09.01.20######################################################################
-rlist <- list.files(pattern="LC08_L1TP_098085_20200109_20200114_01_T1_")
-#rlist to see the files within it
-#we can now make the stack function to connect the images on layers
-#
-#RGB
+setwd("/Users/alessandro/lab/bushfire/kangarooisland/KI09012020") #mac
+
 KI09012020_b <-raster("LC08_L1TP_098085_20200109_20200114_01_T1_B2.TIF")
 KI09012020_g <- raster("LC08_L1TP_098085_20200109_20200114_01_T1_B3.TIF")
 KI09012020_r <- raster("LC08_L1TP_098085_20200109_20200114_01_T1_B4.TIF")
@@ -122,6 +124,7 @@ KI09012020_nir <-raster("LC08_L1TP_098085_20200109_20200114_01_T1_B5.TIF")
 KI09012020_swir <- raster("LC08_L1TP_098085_20200109_20200114_01_T1_B6.TIF")
 KI09012020_panchrom <-raster("LC08_L1TP_098085_20200109_20200114_01_T1_B8.TIF")
 KI09012020_tirs <-raster("LC08_L1TP_098085_20200109_20200114_01_T1_B10.TIF")
+KI09012020_bqa <-raster("LC08_L1TP_098085_20200109_20200114_01_T1_BQA.TIF")
 
 
 #KI09012020_7bands<- stack(c(KI09012020_b, KI09012020_g,KI09012020_r,KI09012020_nir,KI09012020_swir,KI09012020_panchrom,KI09012020_tirs))
@@ -200,11 +203,8 @@ plot(ndvi2, breaks=breaks, col=palette)
 #################################
 
 #####(3) 10.02.20######################################################################
-rlist <- list.files(pattern="LC08_L1TP_098085_20200210_20200224_01_T1_")
-#rlist to see the files within it
-#we can now make the stack function to connect the images on layers
-#
-#RGB
+setwd("/Users/alessandro/lab/bushfire/kangarooisland/KI10022020") #mac
+
 KI10022020_b <-raster("LC08_L1TP_098085_20200210_20200224_01_T1_B2.TIF")
 KI10022020_g <- raster("LC08_L1TP_098085_20200210_20200224_01_T1_B3.TIF")
 KI10022020_r <- raster("LC08_L1TP_098085_20200210_20200224_01_T1_B4.TIF")
@@ -212,6 +212,7 @@ KI10022020_nir <-raster("LC08_L1TP_098085_20200210_20200224_01_T1_B5.TIF")
 KI10022020_swir <- raster("LC08_L1TP_098085_20200210_20200224_01_T1_B6.TIF")
 KI10022020_panchrom <-raster("LC08_L1TP_098085_20200210_20200224_01_T1_B8.TIF")
 KI10022020_tirs <-raster("LC08_L1TP_098085_20200210_20200224_01_T1_B10.TIF")
+KI10022020_bqa <-raster("LC08_L1TP_098085_20200210_20200224_01_T1_BQA.TIF")
 
 
 #KI10022020_7bands<- stack(c(KI10022020_b, KI10022020_g,KI10022020_r,KI10022020_nir,KI10022020_swir,KI10022020_panchrom,KI10022020_tirs))
@@ -292,11 +293,8 @@ plot(ndvi3, breaks=breaks, col=palette)
 #################################
 
 #####(4) 14.04.20######################################################################
-rlist <- list.files(pattern="LC08_L1TP_098085_20200414_20200422_01_T1_")
-#rlist to see the files within it
-#we can now make the stack function to connect the images on layers
-#
-#RGB
+setwd("/Users/alessandro/lab/bushfire/kangarooisland/KI14042020") #mac
+
 KI14042020_b <-raster("LC08_L1TP_098085_20200414_20200422_01_T1_B2.TIF")
 KI14042020_g <- raster("LC08_L1TP_098085_20200414_20200422_01_T1_B3.TIF")
 KI14042020_r <- raster("LC08_L1TP_098085_20200414_20200422_01_T1_B4.TIF")
@@ -304,6 +302,7 @@ KI14042020_nir <-raster("LC08_L1TP_098085_20200414_20200422_01_T1_B5.TIF")
 KI14042020_swir <- raster("LC08_L1TP_098085_20200414_20200422_01_T1_B6.TIF")
 KI14042020_panchrom <-raster("LC08_L1TP_098085_20200414_20200422_01_T1_B8.TIF")
 KI14042020_tirs <-raster("LC08_L1TP_098085_20200414_20200422_01_T1_B10.TIF")
+KI14042020_bqa <-raster("LC08_L1TP_098085_20200414_20200422_01_T1_BQA.TIF")
 
 
 #KI14042020_7bands<- stack(c(KI14042020_b, KI14042020_g,KI14042020_r,KI14042020_nir,KI14042020_swir,KI14042020_panchrom,KI14042020_tirs))
@@ -382,11 +381,8 @@ plot(ndvi4, breaks=breaks, col=palette)
 #################################
 
 #####(5) 16.05.20######################################################################
-rlist <- list.files(pattern="LC08_L1TP_098085_20200516_20200527_01_T1_")
-#rlist to see the files within it
-#we can now make the stack function to connect the images on layers
-#
-#RGB
+setwd("/Users/alessandro/lab/bushfire/kangarooisland/KI16052020") #mac
+
 KI16052020_b <-raster("LC08_L1TP_098085_20200516_20200527_01_T1_B2.TIF")
 KI16052020_g <- raster("LC08_L1TP_098085_20200516_20200527_01_T1_B3.TIF")
 KI16052020_r <- raster("LC08_L1TP_098085_20200516_20200527_01_T1_B4.TIF")
@@ -394,6 +390,7 @@ KI16052020_nir <-raster("LC08_L1TP_098085_20200516_20200527_01_T1_B5.TIF")
 KI16052020_swir <- raster("LC08_L1TP_098085_20200516_20200527_01_T1_B6.TIF")
 KI16052020_panchrom <-raster("LC08_L1TP_098085_20200516_20200527_01_T1_B8.TIF")
 KI16052020_tirs <-raster("LC08_L1TP_098085_20200516_20200527_01_T1_B10.TIF")
+KI16052020_bqa <-raster("LC08_L1TP_098085_20200516_20200527_01_T1_BQA.TIF")
 
 
 #KI16052020_7bands<- stack(c(KI16052020_b, KI16052020_g,KI16052020_r,KI16052020_nir,KI16052020_swir,KI16052020_panchrom,KI16052020_tirs))
@@ -517,11 +514,8 @@ plot(ndvi5, col=palette)
 ####################################FIRE SEASON 2018/2019#############################
 
 #####(6) 05.12.18######################################################################
-rlist <- list.files(pattern="LC08_L1TP_098085_20181205_20181211_01_T1_")
-#rlist to see the files within it
-#we can now make the stack function to connect the images on layers
-#
-#RGB
+setwd("/Users/alessandro/lab/bushfire/kangarooisland/KI05122018") #mac
+
 KI05122018_b <-raster("LC08_L1TP_098085_20181205_20181211_01_T1_B2.TIF")
 KI05122018_g <- raster("LC08_L1TP_098085_20181205_20181211_01_T1_B3.TIF")
 KI05122018_r <- raster("LC08_L1TP_098085_20181205_20181211_01_T1_B4.TIF")
@@ -529,6 +523,7 @@ KI05122018_nir <-raster("LC08_L1TP_098085_20181205_20181211_01_T1_B5.TIF")
 KI05122018_swir <- raster("LC08_L1TP_098085_20181205_20181211_01_T1_B6.TIF")
 KI05122018_panchrom <-raster("LC08_L1TP_098085_20181205_20181211_01_T1_B8.TIF")
 KI05122018_tirs <-raster("LC08_L1TP_098085_20181205_20181211_01_T1_B10.TIF")
+KI05122018_bqa <-raster("LC08_L1TP_098085_20181205_20181211_01_T1_BQA.TIF")
 
 
 #KI05122018_7bands<- stack(c(KI05122018_b, KI05122018_g, KI05122018_r, KI05122018_nir, KI05122018_swir, KI05122018_panchrom, KI05122018_tirs))
@@ -541,10 +536,8 @@ KI05122018_7bands<- stack(c(KI05122018_b, KI05122018_g, KI05122018_r, KI05122018
 #now it works#
 
 
-shp <- shapefile("LANDSCAPE_Biophysical_L3LandZones_GDA2020")
 
 proj4string(KI05122018_7bands)
-proj4string(shp)
 
 shp6 <- spTransform(shp, proj4string(KI05122018_7bands)) 
 
@@ -611,11 +604,8 @@ plot(ndvi6, breaks=breaks, col=palette)
 #################################
 
 #####(7) 06.01.19######################################################################
-rlist <- list.files(pattern="LC08_L1TP_098085_20190106_20190130_01_T1_")
-#rlist to see the files within it
-#we can now make the stack function to connect the images on layers
-#
-#RGB
+setwd("/Users/alessandro/lab/bushfire/kangarooisland/KI06012019") #mac
+
 KI06012019_b <-raster("LC08_L1TP_098085_20190106_20190130_01_T1_B2.TIF")
 KI06012019_g <- raster("LC08_L1TP_098085_20190106_20190130_01_T1_B3.TIF")
 KI06012019_r <- raster("LC08_L1TP_098085_20190106_20190130_01_T1_B4.TIF")
@@ -623,6 +613,7 @@ KI06012019_nir <-raster("LC08_L1TP_098085_20190106_20190130_01_T1_B5.TIF")
 KI06012019_swir <- raster("LC08_L1TP_098085_20190106_20190130_01_T1_B6.TIF")
 KI06012019_panchrom <-raster("LC08_L1TP_098085_20190106_20190130_01_T1_B8.TIF")
 KI06012019_tirs <-raster("LC08_L1TP_098085_20190106_20190130_01_T1_B10.TIF")
+KI06012019_bqa <-raster("LC08_L1TP_098085_20190106_20190130_01_T1_BQA.TIF")
 
 
 #KI06012019_7bands<- stack(c(KI06012019_b, KI06012019_g, KI06012019_r, KI06012019_nir, KI06012019_swir, KI06012019_panchrom, KI06012019_tirs))
@@ -635,10 +626,8 @@ KI06012019_7bands<- stack(c(KI06012019_b, KI06012019_g, KI06012019_r, KI06012019
 #now it works#
 
 
-shp <- shapefile("LANDSCAPE_Biophysical_L3LandZones_GDA2020")
 
 proj4string(KI06012019_7bands)
-proj4string(shp)
 
 shp7 <- spTransform(shp, proj4string(KI06012019_7bands)) 
 
@@ -706,11 +695,8 @@ plot(ndvi7, breaks=breaks, col=palette)
 
 
 #####(8) 12.04.19######################################################################
-rlist <- list.files(pattern="LC08_L1TP_098085_20190412_20190422_01_T1_")
-#rlist to see the files within it
-#we can now make the stack function to connect the images on layers
-#
-#RGB
+setwd("/Users/alessandro/lab/bushfire/kangarooisland/KI12042019") #mac
+
 KI12042019_b <-raster("LC08_L1TP_098085_20190412_20190422_01_T1_B2.TIF")
 KI12042019_g <- raster("LC08_L1TP_098085_20190412_20190422_01_T1_B3.TIF")
 KI12042019_r <- raster("LC08_L1TP_098085_20190412_20190422_01_T1_B4.TIF")
@@ -718,6 +704,7 @@ KI12042019_nir <-raster("LC08_L1TP_098085_20190412_20190422_01_T1_B5.TIF")
 KI12042019_swir <- raster("LC08_L1TP_098085_20190412_20190422_01_T1_B6.TIF")
 KI12042019_panchrom <-raster("LC08_L1TP_098085_20190412_20190422_01_T1_B8.TIF")
 KI12042019_tirs <-raster("LC08_L1TP_098085_20190412_20190422_01_T1_B10.TIF")
+KI12042019_bqa <-raster("LC08_L1TP_098085_20190412_20190422_01_T1_BQA.TIF")
 
 
 #KI12042019_7bands<- stack(c(KI12042019_b, KI12042019_g, KI12042019_r, KI12042019_nir, KI12042019_swir, KI12042019_panchrom, KI12042019_tirs))
@@ -730,10 +717,8 @@ KI12042019_7bands<- stack(c(KI12042019_b, KI12042019_g, KI12042019_r, KI12042019
 #now it works#
 
 
-shp <- shapefile("LANDSCAPE_Biophysical_L3LandZones_GDA2020")
 
 proj4string(KI12042019_7bands)
-proj4string(shp)
 
 shp8 <- spTransform(shp, proj4string(KI12042019_7bands)) 
 
@@ -799,3 +784,7 @@ palette <- colorRampPalette(c("blue", "white", "red"))(8)
 plot(ndvi8, breaks=breaks, col=palette)
 #################################
 #################################
+
+####################################################################################################################################
+##############################################FINAL PLOTS##############################################
+##########################################################################################################################################
