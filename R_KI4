@@ -1,0 +1,120 @@
+###DOWNLOAD FROM: https://glovis.usgs.gov/app, https://data.gov.au/dataset (for the .shp file)
+
+###install.packages() if not already done
+#install.packages("raster")
+#install.packages("rgdal")
+#install.packages("sp")
+
+###make use of the library
+library(raster)
+library(sp)
+library(rgdal)
+#set the working directory in the general folder to extract the shape file that I'll use for every dataset
+
+setwd("/Users/alessandro/lab/bushfire/kangarooisland") #mac
+shp <- shapefile("LANDSCAPE_Biophysical_L3LandZones_GDA2020")
+
+
+################################FIRE SEASON 2019/2020##################################
+######################################################################################
+
+#####(1) 08.12.19######################################################################
+setwd("/Users/alessandro/lab/bushfire/kangarooisland/KI08122019") #mac
+
+rlist1 <- list.files(pattern="LC08_L1TP_098085_20191208_20191217_01_T1_B")
+#rlist to see the files within it
+#we can now make the stack function to connect the images on layers
+#
+import1 <- lapply(rlist1,raster)
+KI08122019_stack <- stack(import1)
+#it doesn't work because of Error in compareRaster(x) : different extent
+KI08122019_panchrom <- resample(KI08122019_panchrom, KI08122019_swir)
+KI08122019_tirs <- resample(KI08122019_tirs, KI08122019_swir)
+
+
+
+
+
+#KI08122019_7bands<- stack(c(KI08122019_b, KI08122019_g, KI08122019_r, KI08122019_nir, KI08122019_swir, KI08122019_panchrom, KI08122019_tirs))
+#i cannot do it because KI08122019_panchrom and KI08122019_tirs have different extent from the rest (they all have 30m, panchrom 15m and tirs 100m)
+
+
+KI08122019_7bands<- stack(c(KI08122019_b, KI08122019_g, KI08122019_r, KI08122019_nir, KI08122019_swir, KI08122019_panchrom, KI08122019_tirs))
+#now it works#
+
+
+shp <- shapefile("LANDSCAPE_Biophysical_L3LandZones_GDA2020")
+
+proj4string(KI08122019_7bands)
+proj4string(shp)
+
+shp1 <- spTransform(shp, proj4string(KI08122019_7bands)) 
+
+plot(KI08122019_7bands)
+  plot(shp1, add=T)
+
+KI08122019_7bands <- mask(crop(KI08122019_7bands, extent(shp1)), shp1)  
+
+plot(KI08122019_7bands)
+  plot(shp1, add=T)
+  
+  
+#####three plots highlighting different things (human eye, vegetation, burnt area) with Kangaroo Island isolated from the rest of the map####
+par(mfrow=c(3,1))
+cl <- colorRampPalette(c('black','grey','light grey'))(100) 
+#B1 blue
+#B2 green
+#B3 red
+#B4 NIR
+#B5 SWIR
+#B6 panchromatic
+#B7 TIRS
+
+#as the human eye see it (red-green-blue)
+plotRGB(KI08122019_7bands,3,2,1, stretch="lin")
+
+#highlighting hot soil temperature in red (TIRS,r,b)
+plotRGB(KI08122019_7bands,7,3,1, stretch="lin")
+
+#highlight the burnt area (SWIR-NIR-red)
+plotRGB(KI08122019_7bands,5,4,3, stretch="lin")
+
+#########################PROVA
+lsCloudMask(src, AppRoot, sensitivity = 2800, overwrite = FALSE,
+  verbose = FALSE, ...)
+Arguments
+
+########################END
+
+
+######NDVI#######
+# Perform raster algebra to calculate a raster of NDVI values
+#ndvi <- (infrared - red) / (infrared + red)  #I use NIR instead of infrared
+ndvi1 <- (KI08122019_nir - KI08122019_r) / (KI08122019_nir + KI08122019_r)
+
+
+#and once again I want to select only the island area
+proj4string(ndvi1)
+proj4string(shp1)
+
+shp1 <- spTransform(shp1, proj4string(ndvi1)) 
+
+plot(ndvi1)
+  plot(shp1, add=T)
+
+ndvi1 <- mask(crop(ndvi1, extent(shp1)), shp1)  
+
+plot(ndvi1)
+  plot(shp1, add=T)
+  
+# Plot the NDVI as a false-color image
+palette = colorRampPalette(c("blue", "white", "red"))(256)
+plot(ndvi1, col=palette)
+
+#NDVI range is between -1 and +1
+#hist(ndvi1, maxpixels = ncell(ndvi1))
+#i see where to focus the range of colours to better enhance it
+breaks <- seq(-0.4, 0.4, 0.1)
+palette <- colorRampPalette(c("blue", "white", "red"))(8)
+plot(ndvi1, breaks=breaks, col=palette)
+#################################
