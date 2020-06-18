@@ -26,9 +26,9 @@ KI08122019_r <- raster("LC08_L1TP_098085_20191208_20191217_01_T1_B4.TIF")
 KI08122019_nir <-raster("LC08_L1TP_098085_20191208_20191217_01_T1_B5.TIF")
 KI08122019_swir <- raster("LC08_L1TP_098085_20191208_20191217_01_T1_B6.TIF")
 KI08122019_panchrom <-raster("LC08_L1TP_098085_20191208_20191217_01_T1_B8.TIF")
+#KI08122019_cir <-raster("LC08_L1TP_098085_20191208_20191217_01_T1_B9.TIF")
 KI08122019_tirs <-raster("LC08_L1TP_098085_20191208_20191217_01_T1_B10.TIF")
 KI08122019_bqa <-raster("LC08_L1TP_098085_20191208_20191217_01_T1_BQA.TIF")
-
 
 #KI08122019_7bands<- stack(c(KI08122019_b, KI08122019_g, KI08122019_r, KI08122019_nir, KI08122019_swir, KI08122019_panchrom, KI08122019_tirs))
 #i cannot do it because KI08122019_panchrom and KI08122019_tirs have different extent from the rest (they all have 30m, panchrom 15m and tirs 100m)
@@ -56,6 +56,13 @@ plot(KI08122019_7bands)
 #####three plots highlighting different things (human eye, vegetation, burnt area) with Kangaroo Island isolated from the rest of the map####
 par(mfrow=c(3,1))
 cl <- colorRampPalette(c('black','grey','light grey'))(100) 
+plotRGB(KI08122019_7bands,3,2,1, stretch="lin")
+plotRGB(KI08122019_7bands,7,2,1, stretch="lin")
+plotRGB(KI08122019_7bands,9,2,1, stretch="lin")
+
+
+
+
 #B1 blue
 #B2 green
 #B3 red
